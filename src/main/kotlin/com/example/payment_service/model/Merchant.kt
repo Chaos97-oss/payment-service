@@ -1,10 +1,10 @@
-package com.example.paymentservice.model
+package com.example.payment_service.model
 
 import jakarta.persistence.Entity
-import jakarta.persistence.Id
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-
+import jakarta.persistence.Id
+import java.util.UUID
 
 @Entity
 data class Merchant(
@@ -12,13 +12,11 @@ data class Merchant(
     val id: String = UUID.randomUUID().toString(),
 
     val businessName: String,
-
     val email: String,
-
     val settlementAccount: String,
 
     @Enumerated(EnumType.STRING)
-    var status: MerchantStatus = MerchantStatus.ACTIVE
+    val status: MerchantStatus = MerchantStatus.ACTIVE
 )
 
 enum class MerchantStatus {
