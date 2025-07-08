@@ -1,10 +1,18 @@
-package com.example.paymentservice.repository
+package com.example.payment_service.repository
 
-import com.example.paymentservice.model.Transaction
+import com.example.payment_service.model.Transaction
+import com.example.payment_service.model.Merchant
+import com.example.payment_service.model.TransactionStatus
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
-@Repository
 interface TransactionRepository : JpaRepository<Transaction, String> {
-    fun findByMerchantId(merchantId: String): List<Transaction>
+    fun findAllByMerchantAndStatusAndCreatedAtBetween(
+        merchant: Merchant,
+        status: TransactionStatus,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): List<Transaction>
+
+    fun findAllByMerchantAndStatus(merchant: Merchant, status: TransactionStatus): List<Transaction>
 }

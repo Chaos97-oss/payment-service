@@ -1,9 +1,9 @@
-package com.example.paymentservice.repository
-
+package com.example.payment_service.repository
 
 import com.example.payment_service.model.Merchant
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
+import java.util.*
 
-@Repository
-interface MerchantRepository : JpaRepository<Merchant, String>
+interface MerchantRepository : JpaRepository<Merchant, String> {
+    fun findByEmail(email: String): Optional<Merchant>
+}

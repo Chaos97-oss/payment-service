@@ -1,21 +1,32 @@
-package com.example.paymentservice.model
+package com.example.payment_service.model
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
+import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity
 data class SettlementBatch(
     @Id
-    val id: String = UUID.randomUUID().toString(),
+    val batchRef: String = UUID.randomUUID().toString(),
 
-    val merchantId: String,
-
-    val batchRef: String,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "merchant_id")
+    val merchant: Merchant,
 
     val totalAmount: BigDecimal,
 
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    val totalFee: BigDecimal,
+
+    val numberOfTransactions: Int,
+
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @OneToMany
+    @JoinTable(
+        name = "settlement_batch_transactions",
+        joinColumns = [JoinColumn(name = "batch_ref")],
+        inverseJoinColumns = [JoinColumn(name = "transaction_ref")]
+    )
+    val transactions: List<Transaction>
 )

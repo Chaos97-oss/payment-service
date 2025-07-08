@@ -1,32 +1,29 @@
-package com.example.paymentservice.model
+package com.example.payment_service.model
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Enumerated
-import jakarta.persistence.EnumType
+import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity
 data class Transaction(
     @Id
-    val id: String = UUID.randomUUID().toString(),
-
-    val merchantId: String,
+    val internalRef: String = UUID.randomUUID().toString(),
 
     val merchantRef: String,
 
-    val internalRef: String,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "merchant_id")
+    val merchant: Merchant,
 
     val amount: BigDecimal,
 
     val currency: String,
 
-    val fee: BigDecimal,
-
     @Enumerated(EnumType.STRING)
     var status: TransactionStatus = TransactionStatus.INITIATED,
+
+    val fee: BigDecimal = BigDecimal.ZERO,
 
     val createdAt: LocalDateTime = LocalDateTime.now()
 )

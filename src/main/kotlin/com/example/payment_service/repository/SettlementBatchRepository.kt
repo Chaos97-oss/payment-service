@@ -1,8 +1,6 @@
-package com.example.paymentservice.repository
+package com.example.payment_service.repository
 
-import com.example.paymentservice.model.SettlementBatch
+import com.example.payment_service.model.SettlementBatch
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
 
-@Repository
 interface SettlementBatchRepository : JpaRepository<SettlementBatch, String>
