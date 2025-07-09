@@ -1,6 +1,7 @@
 package com.example.payment_service.dto.response
 
-import com.example.payment_service.model.MerchantStatus
+
+import com.example.payment_service.enums.MerchantStatus
 
 data class MerchantResponse(
     val id: String,

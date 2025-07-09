@@ -1,32 +1,24 @@
 package com.example.payment_service.model
-
 import jakarta.persistence.*
-import java.math.BigDecimal
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.example.payment_service.model.Transaction
 import java.time.LocalDateTime
-import java.util.*
+import java.math.BigDecimal
+import java.util.UUID
 
 @Entity
 data class SettlementBatch(
     @Id
-    val batchRef: String = UUID.randomUUID().toString(),
+    val id: String = UUID.randomUUID().toString(),
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "merchant_id")
-    val merchant: Merchant,
+    val merchantId: String,
 
     val totalAmount: BigDecimal,
-
-    val totalFee: BigDecimal,
-
-    val numberOfTransactions: Int,
 
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @OneToMany
-    @JoinTable(
-        name = "settlement_batch_transactions",
-        joinColumns = [JoinColumn(name = "batch_ref")],
-        inverseJoinColumns = [JoinColumn(name = "transaction_ref")]
-    )
-    val transactions: List<Transaction>
+    @JoinColumn(name = "batch_id") 
+    @JsonIgnore
+    val transactions: List<Transaction> = emptyList()
 )

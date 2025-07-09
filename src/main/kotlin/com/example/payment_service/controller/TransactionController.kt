@@ -1,6 +1,6 @@
 package com.example.payment_service.controller
 
-import com.example.payment_service.dto.request.InitiateTransactionRequest
+import com.example.payment_service.dto.req.InitiateTransactionRequest
 import com.example.payment_service.dto.response.TransactionResponse
 import com.example.payment_service.model.TransactionStatus
 import com.example.payment_service.service.TransactionService
@@ -14,12 +14,12 @@ class TransactionController(
 ) {
 
     @PostMapping("/initiate")
-    fun initiateTransaction(
-        @RequestBody request: InitiateTransactionRequest
-    ): ResponseEntity<TransactionResponse> {
-        val tx = transactionService.initiateTransaction(request)
-        return ResponseEntity.ok(tx)
-    }
+fun initiateTransaction(
+    @RequestBody req: InitiateTransactionRequest
+): ResponseEntity<TransactionResponse> {
+    val tx = transactionService.initiateTransaction(req)
+    return ResponseEntity.ok(tx.toResponse())
+}
 
     @GetMapping
     fun listTransactions(

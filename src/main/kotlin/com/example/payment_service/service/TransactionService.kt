@@ -1,11 +1,9 @@
 package com.example.payment_service.service
 
-import com.example.payment_service.dto.request.InitiateTransactionRequest
-import com.example.payment_service.dto.response.TransactionResponse
-import com.example.payment_service.model.Transaction
-import com.example.payment_service.model.TransactionStatus
+import com.example.payment_service.model.*
 import com.example.payment_service.repository.MerchantRepository
 import com.example.payment_service.repository.TransactionRepository
+import com.example.payment_service.dto.req.InitiateTransactionRequest
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -15,75 +13,49 @@ class TransactionService(
     private val merchantRepository: MerchantRepository,
     private val transactionRepository: TransactionRepository
 ) {
-    fun initiateTransaction(request: InitiateTransactionRequest): TransactionResponse {
-        val merchant = merchantRepository.findById(request.merchantId)
-            .orElseThrow { IllegalArgumentException("Merchant not found") }
 
-        val feePercentage = BigDecimal("0.015") // 1.5%
-        val maxFee = BigDecimal(200)
+    fun initiateTransaction(req: InitiateTransactionRequest): Transaction {
+    val merchant = merchantRepository.findById(req.merchantId)
+        .orElseThrow { IllegalArgumentException("Merchant not found") }
 
-        var fee = request.amount.multiply(feePercentage)
-        if (fee > maxFee) fee = maxFee
+    val feePercentage = BigDecimal("0.015")
+    val maxFee = BigDecimal(200)
 
-        val transaction = Transaction(
-            merchantId = merchant.id,
-            merchantRef = request.merchantRef,
-            internalRef = java.util.UUID.randomUUID().toString(),
-            amount = request.amount,
-            currency = request.currency,
-            fee = fee,
-            status = TransactionStatus.SUCCESS,
-            createdAt = LocalDateTime.now())
+    var fee = req.amount.multiply(feePercentage)
+    if (fee > maxFee) fee = maxFee
 
-        val saved = transactionRepository.save(transaction)
+    val transaction = Transaction(
+        merchantId = merchant.id,
+        merchantRef = req.merchantRef,
+        amount = req.amount,
+        currency = req.currency,
+        fee = fee,
+        status = TransactionStatus.INITIATED,
+        createdAt = LocalDateTime.now()
+    )
 
-        return TransactionResponse(
-            id = saved.id,
-            merchantId = saved.merchantId,
-            merchantRef = saved.merchantRef,
-            internalRef = saved.internalRef,
-            amount = saved.amount,
-            currency = saved.currency,
-            fee = saved.fee,
-            status = saved.status,
-            createdAt = saved.createdAt
-        )
-    }
+    return transactionRepository.save(transaction)
+}
 
     fun listTransactions(
         merchantId: String,
         status: TransactionStatus?,
         from: String?,
         to: String?
-    ): List<TransactionResponse> {
-        val merchant = merchantRepository.findById(merchantId)
-            .orElseThrow { IllegalArgumentException("Merchant not found") }
-
+    ): List<Transaction> {
         val fromDate = from?.let { LocalDateTime.parse(it) } ?: LocalDateTime.MIN
         val toDate = to?.let { LocalDateTime.parse(it) } ?: LocalDateTime.MAX
 
-        val transactions = if (status != null) {
-            transactionRepository.findAllByMerchantAndStatusAndCreatedAtBetween(
-                merchant, status, fromDate, toDate
-            )
-        } else {
-            transactionRepository.findAllByMerchantAndStatusAndCreatedAtBetween(
-                merchant, TransactionStatus.SUCCESS, fromDate, toDate
-            )
-        }
+        val transactions = transactionRepository.findAllByMerchantIdAndCreatedAtBetween(
+            merchantId,
+            fromDate,
+            toDate
+        )
 
-        return transactions.map {
-            TransactionResponse(
-                id = it.id,
-                merchantId = it.merchantId,
-                merchantRef = it.merchantRef,
-                internalRef = it.internalRef,
-                amount = it.amount,
-                currency = it.currency,
-                fee = it.fee,
-                status = it.status,
-                createdAt = it.createdAt
-            )
+        return if (status != null) {
+            transactions.filter { it.status == status }
+        } else {
+            transactions
         }
     }
 }

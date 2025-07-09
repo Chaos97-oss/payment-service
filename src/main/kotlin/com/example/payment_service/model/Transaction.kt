@@ -5,25 +5,24 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
 
-@Entity
 data class Transaction(
     @Id
-    val internalRef: String = UUID.randomUUID().toString(),
+    val id: String = UUID.randomUUID().toString(),
+
+    val merchantId: String,
 
     val merchantRef: String,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "merchant_id")
-    val merchant: Merchant,
 
     val amount: BigDecimal,
 
     val currency: String,
 
+    val fee: BigDecimal,
+
     @Enumerated(EnumType.STRING)
     var status: TransactionStatus = TransactionStatus.INITIATED,
 
-    val fee: BigDecimal = BigDecimal.ZERO,
+    var settled: Boolean = false,
 
     val createdAt: LocalDateTime = LocalDateTime.now()
 )
