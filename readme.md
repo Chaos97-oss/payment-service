@@ -21,6 +21,40 @@ A simple payment processing service with merchant management, transaction handli
 This service allows creating merchants, initiating transactions, listing transactions, and settling merchant transactions.
 
 Built with Kotlin, Spring Boot, JPA (Hibernate), and uses PostgreSQL/MySQL for persistence.
+
+
+🧰 Architecture & Decisions
+Tech stack: Spring Boot + Kotlin for concise, modern JVM development.
+
+Persistence: JPA/Hibernate to map Kotlin data classes to relational tables.
+
+Domain modeling: Explicit Merchant, Transaction, and SettlementBatch entities to reflect real-world concepts.
+
+DTOs & Mappers: To decouple API contracts from internal entities.
+
+Postman docs: Hosted and linked for easy consumption by frontend or QA.
+
+Why Kotlin?
+
+Null safety and data classes reduce boilerplate.
+
+Interoperable with Java if needed.
+
+Why Postman docs?
+
+Faster onboarding for collaborators and testers.
+
+
+📝 Assumptions Made
+Merchants are created before transactions can be initiated.
+
+Only transactions with TransactionStatus.SUCCESS are eligible for settlement.
+
+Settlements are created per merchant, aggregating all successful transactions at the time of settlement.
+
+No authentication/authorization implemented yet (future improvement).
+
+
 ## 🧪 API Documentation
 
 All API endpoints are documented in the included Postman collection.
