@@ -1,7 +1,8 @@
 package com.example.payment_service.service
 
 import com.example.payment_service.dto.response.SettlementBatchResponse
-import com.example.payment_service.model.TransactionStatus
+// import com.example.payment_service.model.TransactionStatus
+import com.example.payment_service.enums.TransactionStatus
 import com.example.payment_service.model.SettlementBatch
 import com.example.payment_service.repository.MerchantRepository
 import com.example.payment_service.repository.SettlementBatchRepository
@@ -33,10 +34,10 @@ class SettlementService(
         val totalAmount = transactions.fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
         val totalFee = transactions.fold(BigDecimal.ZERO) { acc, t -> acc + t.fee }
         val batch = SettlementBatch(
-    id = UUID.randomUUID().toString(),
-    merchantId = merchant.id,
-    totalAmount = totalAmount,
-    transactions = transactions.toList()
+         id = UUID.randomUUID().toString(),
+        merchant = merchant,
+        totalAmount = totalAmount,
+        transactions = transactions.toMutableList()
 )
 
         settlementBatchRepository.save(batch)

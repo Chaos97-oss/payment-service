@@ -2,7 +2,7 @@ package com.example.payment_service.controller
 
 import com.example.payment_service.dto.req.InitiateTransactionRequest
 import com.example.payment_service.dto.response.TransactionResponse
-import com.example.payment_service.model.TransactionStatus
+import com.example.payment_service.enums.TransactionStatus
 import com.example.payment_service.service.TransactionService
 import org.springframework.http.ResponseEntity
 import com.example.payment_service.mapper.toResponse

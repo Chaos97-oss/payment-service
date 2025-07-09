@@ -1,24 +1,34 @@
 package com.example.payment_service.model
+
 import jakarta.persistence.*
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.example.payment_service.model.Transaction
-import java.time.LocalDateTime
 import java.math.BigDecimal
 import java.util.UUID
 
 @Entity
-data class SettlementBatch(
+@Table(name = "settlement_batches")
+class SettlementBatch(
+
     @Id
-    val id: String = UUID.randomUUID().toString(),
+    var id: String = UUID.randomUUID().toString(),
 
-    val merchantId: String,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "merchant_id")
+    var merchant: Merchant = Merchant(),  // Use default constructor of Merchant
 
-    val totalAmount: BigDecimal,
+    var totalAmount: BigDecimal = BigDecimal.ZERO,
 
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-
-    @OneToMany
-    @JoinColumn(name = "batch_id") 
-    @JsonIgnore
-    val transactions: List<Transaction> = emptyList()
-)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "settlement_batch_transactions",
+        joinColumns = [JoinColumn(name = "batch_id")],
+        inverseJoinColumns = [JoinColumn(name = "transaction_id")]
+    )
+    var transactions: MutableList<Transaction> = mutableListOf()
+) {
+    constructor() : this(
+        id = UUID.randomUUID().toString(),
+        merchant = Merchant(),      
+        totalAmount = BigDecimal.ZERO,
+        transactions = mutableListOf()
+    )
+}

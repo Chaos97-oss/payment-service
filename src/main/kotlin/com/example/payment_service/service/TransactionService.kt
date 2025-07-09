@@ -4,6 +4,7 @@ import com.example.payment_service.model.*
 import com.example.payment_service.repository.MerchantRepository
 import com.example.payment_service.repository.TransactionRepository
 import com.example.payment_service.dto.req.InitiateTransactionRequest
+import com.example.payment_service.enums.TransactionStatus
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -28,7 +29,7 @@ class TransactionService(
     val transaction = Transaction(
     merchantId = merchant.id,
     merchantRef = req.merchantRef,
-    internalRef = UUID.randomUUID().toString(),  // generate or compute this
+    internalRef = UUID.randomUUID().toString(),  
     amount = req.amount,
     currency = req.currency,
     fee = fee,

@@ -5,6 +5,7 @@ import com.example.payment_service.dto.response.MerchantResponse
 import com.example.payment_service.model.Merchant
 import com.example.payment_service.repository.MerchantRepository
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class MerchantService(
@@ -12,19 +13,15 @@ class MerchantService(
 ) {
     fun createMerchant(request: CreateMerchantRequest): MerchantResponse {
         val merchant = Merchant(
+            id = UUID.randomUUID().toString(), // generate ID explicitly
             businessName = request.businessName,
             email = request.email,
-            settlementAccount = request.settlementAccount
+            settlementAccount = request.settlementAccount,
+            status = request.status
         )
 
-        val saved = merchantRepository.save(merchant)
+        val savedMerchant = merchantRepository.save(merchant)
 
-        return MerchantResponse(
-            id = saved.id,
-            businessName = saved.businessName,
-            email = saved.email,
-            settlementAccount = saved.settlementAccount,
-            status = saved.status
-        )
+        return MerchantResponse.fromEntity(savedMerchant)
     }
 }

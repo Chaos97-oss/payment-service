@@ -1,7 +1,7 @@
 package com.example.payment_service.repository
 
 import com.example.payment_service.model.Transaction
-import com.example.payment_service.model.TransactionStatus
+import com.example.payment_service.enums.TransactionStatus
 import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
 

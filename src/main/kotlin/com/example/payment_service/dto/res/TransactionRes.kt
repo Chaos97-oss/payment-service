@@ -1,6 +1,6 @@
 package com.example.payment_service.dto.response
 
-import com.example.payment_service.model.TransactionStatus
+import com.example.payment_service.enums.TransactionStatus
 import java.math.BigDecimal
 import java.time.LocalDateTime
 

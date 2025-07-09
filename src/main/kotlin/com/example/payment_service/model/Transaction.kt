@@ -1,48 +1,41 @@
 package com.example.payment_service.model
 
+import com.example.payment_service.enums.TransactionStatus
 import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
-import com.example.payment_service.enums.TransactionStatus
+
 @Entity
 @Table(name = "transactions")
-class Transaction(
-
+data class Transaction(
     @Id
-    var id: String = UUID.randomUUID().toString(),
+    val id: String = UUID.randomUUID().toString(),
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "merchant_id", nullable = false)
-    var merchant: Merchant? = null,
+    @Column(nullable = false)
+    val merchantId: String,
 
-    var merchantRef: String? = null,
+    @Column(nullable = false)
+    val merchantRef: String,
 
-    var amount: BigDecimal? = null,
+    @Column(nullable = false)
+    val amount: BigDecimal,
 
-    var currency: String? = null,
+    @Column(nullable = false)
+    val currency: String,
 
-    var fee: BigDecimal? = null,
+    @Column(nullable = false)
+    val fee: BigDecimal,
 
-    var internalRef: String = UUID.randomUUID().toString(),
+    @Column(nullable = false)
+    val internalRef: String = UUID.randomUUID().toString(),
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     var status: TransactionStatus = TransactionStatus.INITIATED,
 
     var settled: Boolean = false,
 
-    var createdAt: LocalDateTime = LocalDateTime.now()
-) {
-    constructor() : this(
-        id = "",
-        merchant = null,
-        merchantRef = null,
-        amount = null,
-        currency = null,
-        fee = null,
-        internalRef = "",
-        status = TransactionStatus.INITIATED,
-        settled = false,
-        createdAt = LocalDateTime.now()
-    )
-}
+    @Column(nullable = false)
+    val createdAt: LocalDateTime = LocalDateTime.now()
+)
