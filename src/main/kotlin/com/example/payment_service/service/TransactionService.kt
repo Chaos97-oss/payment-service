@@ -7,6 +7,7 @@ import com.example.payment_service.dto.req.InitiateTransactionRequest
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Service
 class TransactionService(
@@ -25,14 +26,15 @@ class TransactionService(
     if (fee > maxFee) fee = maxFee
 
     val transaction = Transaction(
-        merchantId = merchant.id,
-        merchantRef = req.merchantRef,
-        amount = req.amount,
-        currency = req.currency,
-        fee = fee,
-        status = TransactionStatus.INITIATED,
-        createdAt = LocalDateTime.now()
-    )
+    merchantId = merchant.id,
+    merchantRef = req.merchantRef,
+    internalRef = UUID.randomUUID().toString(),  // generate or compute this
+    amount = req.amount,
+    currency = req.currency,
+    fee = fee,
+    status = TransactionStatus.INITIATED,
+    createdAt = LocalDateTime.now()
+)
 
     return transactionRepository.save(transaction)
 }

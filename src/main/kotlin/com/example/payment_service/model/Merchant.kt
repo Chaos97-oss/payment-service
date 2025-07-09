@@ -1,23 +1,22 @@
 package com.example.payment_service.model
 
 import com.example.payment_service.enums.MerchantStatus
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.Id
-import java.util.*
+import jakarta.persistence.*
 
 @Entity
-data class Merchant(
+@Table(name = "merchants")
+class Merchant(
     @Id
-    val id: String = UUID.randomUUID().toString(),
+    var id: String? = null,
 
-    val businessName: String,
+    var businessName: String? = null,
 
-    val email: String,
+    var email: String? = null,
 
-    val settlementAccount: String,
+    var settlementAccount: String? = null,
 
     @Enumerated(EnumType.STRING)
-    val status: MerchantStatus = MerchantStatus.ACTIVE
-)
+    var status: MerchantStatus? = null
+) {
+    constructor() : this(null, null, null, null, null)
+}

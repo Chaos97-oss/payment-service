@@ -4,29 +4,45 @@ import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
+import com.example.payment_service.enums.TransactionStatus
+@Entity
+@Table(name = "transactions")
+class Transaction(
 
-data class Transaction(
     @Id
-    val id: String = UUID.randomUUID().toString(),
+    var id: String = UUID.randomUUID().toString(),
 
-    val merchantId: String,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "merchant_id", nullable = false)
+    var merchant: Merchant? = null,
 
-    val merchantRef: String,
+    var merchantRef: String? = null,
 
-    val amount: BigDecimal,
+    var amount: BigDecimal? = null,
 
-    val currency: String,
+    var currency: String? = null,
 
-    val fee: BigDecimal,
+    var fee: BigDecimal? = null,
+
+    var internalRef: String = UUID.randomUUID().toString(),
 
     @Enumerated(EnumType.STRING)
     var status: TransactionStatus = TransactionStatus.INITIATED,
 
     var settled: Boolean = false,
 
-    val createdAt: LocalDateTime = LocalDateTime.now()
-)
-
-enum class TransactionStatus {
-    INITIATED, SUCCESS, FAILED
+    var createdAt: LocalDateTime = LocalDateTime.now()
+) {
+    constructor() : this(
+        id = "",
+        merchant = null,
+        merchantRef = null,
+        amount = null,
+        currency = null,
+        fee = null,
+        internalRef = "",
+        status = TransactionStatus.INITIATED,
+        settled = false,
+        createdAt = LocalDateTime.now()
+    )
 }
