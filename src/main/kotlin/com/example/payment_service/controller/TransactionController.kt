@@ -22,7 +22,7 @@ fun initiateTransaction(
     return ResponseEntity.ok(tx.toResponse())
 }
 
-    @GetMapping
+    @GetMapping("/view")
 fun listTransactions(
     @RequestParam merchantId: String,
     @RequestParam(required = false) status: TransactionStatus?,

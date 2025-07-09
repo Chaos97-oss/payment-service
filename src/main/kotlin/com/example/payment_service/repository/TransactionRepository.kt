@@ -15,4 +15,5 @@ interface TransactionRepository : JpaRepository<Transaction, String> {
         from: LocalDateTime,
         to: LocalDateTime
     ): List<Transaction>
+    fun findAllByMerchantId(merchantId: String): List<Transaction>
 }

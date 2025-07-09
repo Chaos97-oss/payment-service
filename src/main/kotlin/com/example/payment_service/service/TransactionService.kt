@@ -40,20 +40,19 @@ class TransactionService(
     return transactionRepository.save(transaction)
 }
 
-    fun listTransactions(
+   fun listTransactions(
         merchantId: String,
         status: TransactionStatus?,
         from: String?,
         to: String?
     ): List<Transaction> {
-        val fromDate = from?.let { LocalDateTime.parse(it) } ?: LocalDateTime.MIN
-        val toDate = to?.let { LocalDateTime.parse(it) } ?: LocalDateTime.MAX
+        val fromDate = from?.let { LocalDateTime.parse(it) }
+        val toDate = to?.let { LocalDateTime.parse(it) }
 
-        val transactions = transactionRepository.findAllByMerchantIdAndCreatedAtBetween(
-            merchantId,
-            fromDate,
-            toDate
-        )
+        val transactions = when {
+            fromDate != null && toDate != null -> transactionRepository.findAllByMerchantIdAndCreatedAtBetween(merchantId, fromDate, toDate)
+            else -> transactionRepository.findAllByMerchantId(merchantId)
+        }
 
         return if (status != null) {
             transactions.filter { it.status == status }

@@ -8,34 +8,42 @@ import java.util.*
 
 @Entity
 @Table(name = "transactions")
-data class Transaction(
+class Transaction(
+
     @Id
-    val id: String = UUID.randomUUID().toString(),
+    var id: String = UUID.randomUUID().toString(),
 
-    @Column(nullable = false)
-    val merchantId: String,
+    var merchantId: String = "",
 
-    @Column(nullable = false)
-    val merchantRef: String,
+    var merchantRef: String = "",
 
-    @Column(nullable = false)
-    val amount: BigDecimal,
+    var amount: BigDecimal = BigDecimal.ZERO,
 
-    @Column(nullable = false)
-    val currency: String,
+    var currency: String = "",
 
-    @Column(nullable = false)
-    val fee: BigDecimal,
+    var fee: BigDecimal = BigDecimal.ZERO,
 
-    @Column(nullable = false)
-    val internalRef: String = UUID.randomUUID().toString(),
+    var internalRef: String = UUID.randomUUID().toString(),
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     var status: TransactionStatus = TransactionStatus.INITIATED,
 
     var settled: Boolean = false,
 
-    @Column(nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now()
-)
+    var createdAt: LocalDateTime = LocalDateTime.now()
+
+) {
+    // No-arg constructor required by Hibernate
+    constructor() : this(
+        id = UUID.randomUUID().toString(),
+        merchantId = "",
+        merchantRef = "",
+        amount = BigDecimal.ZERO,
+        currency = "",
+        fee = BigDecimal.ZERO,
+        internalRef = UUID.randomUUID().toString(),
+        status = TransactionStatus.INITIATED,
+        settled = false,
+        createdAt = LocalDateTime.now()
+    )
+}

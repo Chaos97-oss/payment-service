@@ -21,33 +21,39 @@ class SettlementService(
 ) {
 
     fun settleMerchantTransactions(merchantId: String): SettlementBatchResponse {
-        val merchant = merchantRepository.findById(merchantId)
-            .orElseThrow { IllegalArgumentException("Merchant not found") }
+    val merchant = merchantRepository.findById(merchantId)
+        .orElseThrow { IllegalArgumentException("Merchant not found") }
 
+    val transactions = transactionRepository.findAllByMerchantIdAndStatus(merchant.id, TransactionStatus.SUCCESS)
 
-        val transactions = transactionRepository.findAllByMerchantIdAndStatus(merchant.id, TransactionStatus.SUCCESS)
+    if (transactions.isEmpty()) {
+       
+        return SettlementBatchResponse(
+            batchRef = "",
+            merchantId = merchant.id,
+            totalAmount = BigDecimal.ZERO,
+            feeDeducted = BigDecimal.ZERO,
+            transactionCount = 0
+        )
+    }
 
-        if (transactions.isEmpty()) {
-            throw IllegalArgumentException("No transactions to settle for this merchant")
-        }
-
-        val totalAmount = transactions.fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
-        val totalFee = transactions.fold(BigDecimal.ZERO) { acc, t -> acc + t.fee }
-        val batch = SettlementBatch(
-         id = UUID.randomUUID().toString(),
+    val totalAmount = transactions.fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
+    val totalFee = transactions.fold(BigDecimal.ZERO) { acc, t -> acc + t.fee }
+    val batch = SettlementBatch(
+        id = UUID.randomUUID().toString(),
         merchant = merchant,
         totalAmount = totalAmount,
         transactions = transactions.toMutableList()
-)
+    )
 
-        settlementBatchRepository.save(batch)
+    settlementBatchRepository.save(batch)
 
-        return SettlementBatchResponse(
-            batchRef = batch.id,
-            merchantId = merchant.id,
-            totalAmount = totalAmount,
-            feeDeducted = totalFee,
-            transactionCount = transactions.size
-        )
-    }
+    return SettlementBatchResponse(
+        batchRef = batch.id,
+        merchantId = merchant.id,
+        totalAmount = totalAmount,
+        feeDeducted = totalFee,
+        transactionCount = transactions.size
+    )
+}
 }
