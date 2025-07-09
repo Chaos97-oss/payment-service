@@ -13,7 +13,7 @@ class SettlementBatch(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id")
-    var merchant: Merchant = Merchant(),  // Use default constructor of Merchant
+    var merchant: Merchant = Merchant(),  
 
     var totalAmount: BigDecimal = BigDecimal.ZERO,
 

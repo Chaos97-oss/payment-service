@@ -13,7 +13,7 @@ class MerchantService(
 ) {
     fun createMerchant(request: CreateMerchantRequest): MerchantResponse {
         val merchant = Merchant(
-            id = UUID.randomUUID().toString(), // generate ID explicitly
+            id = UUID.randomUUID().toString(), 
             businessName = request.businessName,
             email = request.email,
             settlementAccount = request.settlementAccount,

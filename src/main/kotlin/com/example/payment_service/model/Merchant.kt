@@ -19,5 +19,5 @@ class Merchant(
     @Enumerated(EnumType.STRING)
     var status: MerchantStatus = MerchantStatus.INACTIVE
 ) {
-    // No need for explicit no-args constructor now, default values handle that
+   
 }
