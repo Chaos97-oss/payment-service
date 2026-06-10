@@ -1,4 +1,4 @@
-package com.example.payment_service.dto.response
+package com.example.payment_service.dto.res
 
 import com.example.payment_service.enums.TransactionStatus
 import java.math.BigDecimal
@@ -13,5 +13,6 @@ data class TransactionResponse(
     val currency: String,
     val fee: BigDecimal,
     val status: TransactionStatus,
+    val settled: Boolean,
     val createdAt: LocalDateTime
 )

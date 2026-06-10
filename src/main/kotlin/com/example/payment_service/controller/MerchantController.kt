@@ -1,7 +1,7 @@
 package com.example.payment_service.controller
 
-import com.example.payment_service.dto.request.CreateMerchantRequest
-import com.example.payment_service.dto.response.MerchantResponse
+import com.example.payment_service.dto.req.CreateMerchantRequest
+import com.example.payment_service.dto.res.MerchantResponse
 import com.example.payment_service.service.MerchantService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

@@ -1,157 +1,94 @@
 # Payment Service API
 
-A simple payment processing service with merchant management, transaction handling, and settlement processing built with Kotlin and Spring Boot.
+A small Kotlin/Spring Boot backend that models merchant creation, payment initiation, transaction listing, and merchant settlement batching.
 
----
+## Requirements Covered
 
-## Table of Contents
+- Create merchants with business name, email, settlement account, and status.
+- Initiate transactions with amount, currency, merchant reference, merchant ID, generated internal reference, and a simulated successful customer debit.
+- Calculate a flat fee of 1.5 percent capped at 200.00.
+- List transactions by merchant, with optional status and date filters.
+- Settle unsettled successful transactions into a settlement batch.
+- Mark transactions as settled after batching so the same transaction is not settled twice.
+- Use a relational database with explicit SQL through `JdbcTemplate`.
+- Document REST endpoints with a local OpenAPI file.
 
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [API Documentation](#api-documentation)
-- [Running Tests](#running-tests)
-- [Contributing](#contributing)
-- [License](#license)
+## Tech Stack
 
----
+- Kotlin
+- Spring Boot Web
+- Spring JDBC
+- MySQL
+- Gradle
 
-## Project Overview
+## Architecture
 
-This service allows creating merchants, initiating transactions, listing transactions, and settling merchant transactions.
+The service is split into controller, service, repository, DTO, mapper, and model packages.
 
-Built with Kotlin, Spring Boot, JPA (Hibernate), and uses PostgreSQL/MySQL for persistence.
+- Controllers expose REST endpoints and convert domain models to API responses.
+- Services own business rules such as fee calculation, idempotency, and settlement eligibility.
+- Repositories own SQL and persistence details using `JdbcTemplate`.
+- Models are plain Kotlin domain objects, not ORM entities.
+- DTOs keep API contracts separate from internal models.
 
+The repository layer uses raw SQL instead of a heavy ORM so table structure, joins, and update behavior remain explicit.
 
-🧰 Architecture & Decisions
-Tech stack: Spring Boot + Kotlin for concise, modern JVM development.
+## Setup
 
-Persistence: JPA/Hibernate to map Kotlin data classes to relational tables.
+1. Create a MySQL database:
 
-Domain modeling: Explicit Merchant, Transaction, and SettlementBatch entities to reflect real-world concepts.
+   ```sql
+   CREATE DATABASE payment_service_db;
+   ```
 
-DTOs & Mappers: To decouple API contracts from internal entities.
+2. Configure database credentials in `src/main/resources/application.properties`:
 
-Postman docs: Hosted and linked for easy consumption by frontend or QA.
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/payment_service_db
+   spring.datasource.username=your_username
+   spring.datasource.password=your_password
+   spring.sql.init.mode=always
+   ```
 
-Why Kotlin?
-
-Null safety and data classes reduce boilerplate.
-
-Interoperable with Java if needed.
-
-Why Postman docs?
-
-Faster onboarding for collaborators and testers.
-
-
-📝 Assumptions Made
-Merchants are created before transactions can be initiated.
-
-Only transactions with TransactionStatus.SUCCESS are eligible for settlement.
-
-Settlements are created per merchant, aggregating all successful transactions at the time of settlement.
-
-No authentication/authorization implemented yet (future improvement).
-
-
-## 🧪 API Documentation
-
-All API endpoints are documented in the included Postman collection.
-
-### 📄 Postman Collection
-
-## 📄 API Documentation
-
-You can view and test the full API documentation via Postman here:  
-👉 [View Postman Documentation](https://documenter.getpostman.com/view/43208616/2sB34eJ2fZ)
-
-Alternatively, you can download the Postman collection JSON file directly from this repository:  
-👉 [Download Postman Collection (JSON)](https://github.com/chaos97-oss/payment-service/blob/main/postman/payment-service.postman_collection.json)
-
-Or get the raw JSON:  
-👉 [Raw JSON](https://github.com/chaos97-oss/payment-service/raw/main/postman/payment-service.postman_collection.json)
-
-
-#### 🔗 Import into Postman:
-1. Open Postman.
-2. Click `Import`.
-3. Select the file: `payment-service.postman_collection.json`.
-4. Use the `Payment Service API` collection in your workspace.
-
----
-
-### 🛣 Example Endpoints
-
-✅ Create Merchant  
-`POST /api/merchants`
-
-✅ Get Merchants  
-`GET /api/merchants`
-
-✅ Initiate Transaction  
-`POST /api/transactions/initiate`
-
-✅ List Transactions  
-`GET /api/transactions`
-
-✅ Settle Transactions  
-`POST /api/settlements/settle?merchantId=<merchant-id>`
-
----
-
-## Features
-
-- Create and manage merchants
-- Initiate and list transactions with filtering options
-- Settle transactions for merchants in batches
-- RESTful API design
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Java 17+
-- Gradle 7+
-- PostgreSQL or MySQL (or your preferred RDBMS)
-- Postman (optional, for testing APIs)
-
-### Setup
-
-1. Clone the repo:
+3. Run the application:
 
    ```bash
-   git clone https://github.com/chaoss97-oss/payment-service.git
-   cd payment-service
+   ./gradlew bootRun
+   ```
 
-2. Configure your database connection in src/main/resources/application.properties or application.yml:
+The API runs at `http://localhost:8080`.
 
+## API Documentation
 
+OpenAPI documentation is available at `docs/openapi.yaml`.
 
-### Properties
-  spring.datasource.url=jdbc:postgresql://localhost:5432/payment_db
-  pring.datasource.username=your_username
-  spring.datasource.password=your_password  
-  spring.jpa.hibernate.ddl-auto=update
-  
-###
+Main endpoints:
 
+- `POST /api/merchants`
+- `POST /api/transactions`
+- `GET /api/transactions?merchantId={merchantId}&status=SUCCESS&from=2026-01-01T00:00:00&to=2026-01-31T23:59:59`
+- `POST /api/merchants/{merchantId}/settlements`
 
-3. 
-  
-  ### Build and run the app:
-  /gradlew bootRun
-  ###
-  The API will be available at: http://localhost:8080
+Legacy aliases are still supported:
 
-4.
-API Documentation
-You can explore and test the API endpoints using our Postman Collection.
-###
-https://documenter.getpostman.com/view/43208616/2sB34eJ2fZ
-###
+- `POST /api/transactions/initiate`
+- `GET /api/transactions/view`
+- `POST /api/settlements/settle?merchantId={merchantId}`
 
+## Assumptions
 
-Feel free to open issues or submit pull requests!!!
+- A valid initiated transaction simulates a successful customer debit and is saved with `SUCCESS` status.
+- `merchantRef` is idempotent per merchant. Reusing the same merchant reference returns the existing transaction.
+- Settlement `totalAmount` is the net amount payable to the merchant after fees.
+- Only `SUCCESS` transactions with `settled = false` are eligible for settlement.
+- Authentication is not implemented in this version.
+
+## Tests
+
+Run tests with:
+
+```bash
+./gradlew test
+```
+
+Note: the Gradle wrapper jar must be present at `gradle/wrapper/gradle-wrapper.jar` for wrapper commands to work.

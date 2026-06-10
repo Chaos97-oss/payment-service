@@ -1,23 +1,16 @@
 package com.example.payment_service.model
 
 import com.example.payment_service.enums.MerchantStatus
-import jakarta.persistence.*
 import java.util.UUID
 
-@Entity
-@Table(name = "merchants")
-class Merchant(
-    @Id
-    var id: String = UUID.randomUUID().toString(),
+data class Merchant(
+    val id: String = UUID.randomUUID().toString(),
 
-    var businessName: String = "",
+    val businessName: String = "",
 
-    var email: String = "",
+    val email: String = "",
 
-    var settlementAccount: String = "",
+    val settlementAccount: String = "",
 
-    @Enumerated(EnumType.STRING)
-    var status: MerchantStatus = MerchantStatus.INACTIVE
-) {
-   
-}
+    val status: MerchantStatus = MerchantStatus.INACTIVE
+)

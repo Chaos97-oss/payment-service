@@ -1,4 +1,4 @@
-package com.example.payment_service.dto.response
+package com.example.payment_service.dto.res
 
 import com.example.payment_service.model.Merchant
 import com.example.payment_service.enums.MerchantStatus

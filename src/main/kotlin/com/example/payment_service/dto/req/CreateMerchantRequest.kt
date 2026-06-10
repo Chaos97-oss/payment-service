@@ -1,4 +1,5 @@
-package com.example.payment_service.dto.request
+package com.example.payment_service.dto.req
+
 import com.example.payment_service.enums.MerchantStatus
 
 data class CreateMerchantRequest(

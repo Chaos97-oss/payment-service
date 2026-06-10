@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: Payment Service API
+  version: 1.0.0
+  description: Merchant payment initiation, transaction listing, and settlement batching.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/merchants:
+    post:
+      summary: Create a merchant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMerchantRequest'
+      responses:
+        '200':
+          description: Created merchant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantResponse'
+  /api/transactions:
+    post:
+      summary: Initiate a transaction
+      description: Valid transactions simulate a successful customer debit and calculate a capped 1.5 percent fee.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitiateTransactionRequest'
+      responses:
+        '200':
+          description: Initiated transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+    get:
+      summary: List merchant transactions
+      parameters:
+        - name: merchantId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/TransactionStatus'
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Merchant transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+  /api/merchants/{merchantId}/settlements:
+    post:
+      summary: Settle unsettled successful merchant transactions
+      parameters:
+        - name: merchantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Settlement batch summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettlementBatchResponse'
+components:
+  schemas:
+    MerchantStatus:
+      type: string
+      enum: [ACTIVE, INACTIVE]
+    TransactionStatus:
+      type: string
+      enum: [INITIATED, SUCCESS, FAILED]
+    CreateMerchantRequest:
+      type: object
+      required: [businessName, email, settlementAccount, status]
+      properties:
+        businessName:
+          type: string
+        email:
+          type: string
+          format: email
+        settlementAccount:
+          type: string
+        status:
+          $ref: '#/components/schemas/MerchantStatus'
+    InitiateTransactionRequest:
+      type: object
+      required: [merchantId, merchantRef, amount, currency]
+      properties:
+        merchantId:
+          type: string
+        merchantRef:
+          type: string
+        amount:
+          type: number
+          format: decimal
+          minimum: 0.01
+        currency:
+          type: string
+          example: NGN
+    MerchantResponse:
+      allOf:
+        - $ref: '#/components/schemas/CreateMerchantRequest'
+        - type: object
+          required: [id]
+          properties:
+            id:
+              type: string
+    TransactionResponse:
+      type: object
+      required: [id, merchantId, merchantRef, internalRef, amount, currency, fee, status, settled, createdAt]
+      properties:
+        id:
+          type: string
+        merchantId:
+          type: string
+        merchantRef:
+          type: string
+        internalRef:
+          type: string
+        amount:
+          type: number
+          format: decimal
+        currency:
+          type: string
+        fee:
+          type: number
+          format: decimal
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        settled:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    SettlementBatchResponse:
+      type: object
+      required: [batchRef, merchantId, totalAmount, feeDeducted, transactionCount]
+      properties:
+        batchRef:
+          type: string
+        merchantId:
+          type: string
+        totalAmount:
+          type: number
+          format: decimal
+          description: Net amount settled after fee deduction.
+        feeDeducted:
+          type: number
+          format: decimal
+        transactionCount:
+          type: integer

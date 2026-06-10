@@ -1,6 +1,6 @@
 package com.example.payment_service.mapper
 
-import com.example.payment_service.dto.response.TransactionResponse
+import com.example.payment_service.dto.res.TransactionResponse
 import com.example.payment_service.model.Transaction
 
 fun Transaction.toResponse(): TransactionResponse =
@@ -13,5 +13,6 @@ fun Transaction.toResponse(): TransactionResponse =
         currency = this.currency,
         fee = this.fee,
         status = this.status,
+        settled = this.settled,
         createdAt = this.createdAt
     )
